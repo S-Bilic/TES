@@ -11,10 +11,10 @@ namespace TES
     static class Program
     {
         private static List<DataPoint> _dataList = new List<DataPoint>();
-        private static double Alpha = 0.3;
-        private static double Gamma = 0.22;
-        private static SES ses = new SES(Alpha);
-        private static DES des = new DES(Alpha, Gamma);
+        private static double _Alpha = 0.3;
+        private static double _Gamma = 0.22;
+        private static SES ses = new SES(_Alpha);
+        private static DES des;
         private static List<DataPoint> SESResults;
         private static List<DataPoint> DESResults;
         private static List<DataPoint> TESResults;
@@ -36,29 +36,73 @@ namespace TES
 
         private static void CalculateResults()
         {
-
-            for (double a = 0.1; a < 1; a += 0.1)
-            {
-                //Only calculate SES
-                for (double b = 0.1; b < 1; b += 0.1)
-                {
-                    //Only calculate DES
-                    for (double c = 0.1; c < 1; c += 0.1)
-                    {
-                        //Calculate TES
-                    }
-                }
-            }
-
-            SESResults = _dataList.Where(x => x.Time < 37).ToList();
-            DESResults = _dataList.Where(x => x.Time < 37).ToList();
-
-            foreach (var point in _dataList.Where(x => x.Time >= 37).ToList())
+            //SES part
+            var items = _dataList.Where(x => x.Time < 1).ToList();
+            SESResults = items;
+            foreach (var point in _dataList.Where(x => x.Time >= 1).ToList())
             {
                 var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                 SESResults.Add(ses.CalculateResult(point, previousPoint));
-                DESResults.Add(des.CalculateResult(point, previousPoint));
             }
+
+            double stap = 0.1;
+            double sse = 0;
+            double Alpha = 0.1;
+            double Gamma = 0.1;
+            _Gamma = 0.1;
+            _Alpha = 0.1;
+            while(stap >= 0.001)
+            { 
+                for (double a = 0; a < 10; a ++)
+                {
+                    for (double b = 0; b < 10; b++)
+                    {
+                        des = new DES(_Alpha + (a * stap), _Gamma + (b * stap));
+                        //Only calculate DES
+                        DESResults = _dataList.Where(x => x.Time < 1).ToList();
+                        foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < 37).ToList())
+                        {
+                            var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
+                            DESResults.Add(des.CalculateResult(point, previousPoint));
+                        }
+                        var lastPoint = DESResults.FirstOrDefault(x => x.Time == 36);
+                        for (int t = 37; t < 49; t++)
+                        {
+                            var datapoint = new DataPoint
+                            {
+                                Time = t,
+                                Demand = ((t - 16) * lastPoint.Trend) + lastPoint.Demand,
+                                ForecastError = 0,
+                                Trend =0,
+                                Level = 0,
+                                OneStepForecast = 0,
+                                Seasonal = 0,
+                                SquaredError = 0
+                            };
+                            DESResults.Add(datapoint);
+                        }
+                        double currSSE = DESResults.Sum(x => x.SquaredError);
+                        if (sse == 0 || sse > currSSE)
+                        {
+                            sse = currSSE;
+                            if (stap == 10)
+                            {
+                                Gamma = b * stap;
+                                Alpha = a * stap;
+                            }
+                            else {
+                                Alpha = _Alpha + (a * stap);
+                                Gamma = _Gamma + (b * stap);
+                            }
+                        }
+                    }
+                }
+                _Alpha = Alpha;
+                _Gamma = Gamma;
+                stap /= 10;
+            }
+
+            
 
         }
 
