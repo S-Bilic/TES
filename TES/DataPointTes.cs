@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TES
 {
-    public class DataPoint
+    public class DataPointTes
     {
         public int Time { get; set; }
         public double Demand { get; set; }

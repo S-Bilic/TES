@@ -16,7 +16,7 @@ namespace TES
             this.Gamma = gamma;
         }
 
-        public DataPoint CalculateResult(DataPoint CurrentPoint, DataPoint PreviousPoint)
+        public DataPointTes CalculateResult(DataPointTes CurrentPoint, DataPointTes PreviousPoint)
         {
             CurrentPoint.OneStepForecast = PreviousPoint.Level + PreviousPoint.Trend;
             CurrentPoint.ForecastError = CurrentPoint.Demand - CurrentPoint.OneStepForecast;

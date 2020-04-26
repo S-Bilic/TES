@@ -10,14 +10,18 @@ namespace TES
 {
     static class Program
     {
-        private static List<DataPoint> _dataList = new List<DataPoint>();
-        private static double _Alpha = 0.3;
-        private static double _Gamma = 0.22;
-        private static SES ses = new SES(_Alpha);
-        private static DES des;
-        private static List<DataPoint> SESResults;
-        private static List<DataPoint> DESResults;
-        private static List<DataPoint> TESResults;
+        public static List<DataPointTes> _dataList = new List<DataPointTes>();
+        public static double _Alpha = 0.3;
+        public static double _Gamma = 0.22;
+        public static double _TesGamma = 0.00;
+        public static double _TesAlpha = 0.00;
+        public static double _TesDelta = 0.00;
+        public static SES ses = new SES(_Alpha);
+        public static DES des;
+        public static TES tes;
+        public static List<DataPointTes> SESResults;
+        public static List<DataPointTes> DESResults;
+        public static List<DataPointTes> TESResults;
 
         /// <summary>
         /// The main entry point for the application.
@@ -44,36 +48,47 @@ namespace TES
                 var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                 SESResults.Add(ses.CalculateResult(point, previousPoint));
             }
-
+            int LastKnownPoint = 37;
+            int increment = 12;
             double stap = 0.1;
             double sse = 0;
             double Alpha = 0.1;
             double Gamma = 0.1;
             _Gamma = 0.1;
             _Alpha = 0.1;
-            while(stap >= 0.001)
-            { 
-                for (double a = 0; a < 10; a ++)
+
+
+            double TesSSE = 0;
+            double TesAlpha = 0.1;
+            double TesGamma = 0.1;
+            double TesDelta = 0.1;
+            _TesGamma = 0.1;
+            _TesAlpha = 0.1;
+            _TesDelta = 0.1;
+
+            while (stap >= 0.001)
+            {
+                for (double a = 0; a < 10; a++)
                 {
                     for (double b = 0; b < 10; b++)
                     {
                         des = new DES(_Alpha + (a * stap), _Gamma + (b * stap));
                         //Only calculate DES
                         DESResults = _dataList.Where(x => x.Time < 1).ToList();
-                        foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < 37).ToList())
+                        foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < LastKnownPoint).ToList())
                         {
                             var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                             DESResults.Add(des.CalculateResult(point, previousPoint));
                         }
-                        var lastPoint = DESResults.FirstOrDefault(x => x.Time == 36);
-                        for (int t = 37; t < 49; t++)
+                        var lastPoint = DESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
+                        for (int t = LastKnownPoint; t < 49; t++)
                         {
-                            var datapoint = new DataPoint
+                            var datapoint = new DataPointTes
                             {
                                 Time = t,
                                 Demand = ((t - 16) * lastPoint.Trend) + lastPoint.Demand,
                                 ForecastError = 0,
-                                Trend =0,
+                                Trend = 0,
                                 Level = 0,
                                 OneStepForecast = 0,
                                 Seasonal = 0,
@@ -90,20 +105,80 @@ namespace TES
                                 Gamma = b * stap;
                                 Alpha = a * stap;
                             }
-                            else {
+                            else
+                            {
                                 Alpha = _Alpha + (a * stap);
                                 Gamma = _Gamma + (b * stap);
+                            }
+                        }
+
+                        for (double c = 0; c < 10; c++)
+                        {
+                            tes = new TES(_TesAlpha + (a * stap), _TesGamma + (b * stap), _TesDelta + (c * stap));
+                            TESResults = _dataList.Where(x => x.Time < 1).ToList();
+                            var tesLastPoint = TESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
+                            foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < LastKnownPoint).ToList())
+                            {
+                                var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
+                                double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == point.Time - increment).Seasonal;
+                                TESResults.Add(tes.CalculateResult(point, previousPoint, SeasonalAdjustment));
+                            }
+
+                            double TescurrSSE = TESResults.Sum(x => x.SquaredError);
+                            if (TesSSE == 0 || TesSSE > TescurrSSE)
+                            {
+                                TesSSE = TescurrSSE;
+                                if (stap == 10)
+                                {
+                                    TesGamma = b * stap;
+                                    TesAlpha = a * stap;
+                                    TesDelta = c * stap;
+                                }
+                                else
+                                {
+                                    TesAlpha = _TesAlpha + (a * stap);
+                                    TesGamma = _TesGamma + (b * stap);
+                                    TesDelta = _TesDelta + (c * stap);
+                                }
                             }
                         }
                     }
                 }
                 _Alpha = Alpha;
                 _Gamma = Gamma;
+
+                _TesAlpha = TesAlpha;
+                _TesGamma = TesGamma;
+                _TesDelta = TesDelta;
                 stap /= 10;
             }
 
-            
-
+            //Calculate for predictions correctly
+            tes = new TES(_TesAlpha, _TesGamma, _TesDelta);
+            var TesLastPoint = TESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
+            TESResults = _dataList.Where(x => x.Time < 1).ToList();
+            foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < LastKnownPoint).ToList())
+            {
+                var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
+                double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == point.Time - increment).Seasonal;
+                TESResults.Add(tes.CalculateResult(point, previousPoint, SeasonalAdjustment));
+            }
+            for (int t = LastKnownPoint; t < 49; t++)
+            {
+                double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == t - increment).Seasonal;
+                var datapoint = new DataPointTes
+                {
+                    Time = t,
+                    Demand = tes.PredictValues(TesLastPoint, SeasonalAdjustment, t),
+                    ForecastError = 0,
+                    Trend = 0,
+                    Level = 0,
+                    OneStepForecast = 0,
+                    Seasonal = 0,
+                    SquaredError = 0
+                };
+                TESResults.Add(datapoint);
+            }
         }
 
         private static void SetData()
@@ -117,7 +192,7 @@ namespace TES
             var data = ((object[,])rows.Value);
             for (int i = 0; i < rows.Rows; i++)
             {
-                var point = new DataPoint();
+                var point = new DataPointTes();
                 point.Time = int.Parse(data[i, 0].ToString());
                 point.Demand = double.Parse(data[i, 1] == null ? "0" : data[i, 1].ToString());
                 point.Level = double.Parse(data[i, 2] == null ? "0" : data[i, 2].ToString());

@@ -14,7 +14,7 @@ namespace TES
             this.Alpha = Alpha;
         }
 
-        public DataPoint CalculateResult(DataPoint point, DataPoint previousPoint)
+        public DataPointTes CalculateResult(DataPointTes point, DataPointTes previousPoint)
         {
             point.Level = previousPoint.Level + Alpha * (point.Demand - previousPoint.Level);
             point.OneStepForecast = previousPoint.Level;
