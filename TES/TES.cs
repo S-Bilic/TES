@@ -11,13 +11,13 @@ namespace TES
         public double Alpha;
         public double Gamma;
         public double Delta;
+
         public TES(double alpha, double gamma, double delta)
         {
             this.Alpha = alpha;
             this.Gamma = gamma;
             this.Delta = delta;
         }
-
 
         public DataPointTes CalculateResult(DataPointTes CurrentPoint, DataPointTes PreviousPoint, double SeasonalAdjustment)
         {

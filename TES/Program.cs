@@ -29,8 +29,9 @@ namespace TES
         [STAThread]
         static void Main()
         {
+            // Init. data
             SetData();
-
+            // Bereken resultaten
             CalculateResults();
 
             Application.EnableVisualStyles();
@@ -48,6 +49,8 @@ namespace TES
                 var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                 SESResults.Add(ses.CalculateResult(point, previousPoint));
             }
+
+            // Init. variables
             int LastKnownPoint = 37;
             int increment = 12;
             double stap = 0.1;
@@ -56,7 +59,6 @@ namespace TES
             double Gamma = 0.1;
             _Gamma = 0.1;
             _Alpha = 0.1;
-
 
             double TesSSE = 0;
             double TesAlpha = 0.1;
@@ -121,10 +123,13 @@ namespace TES
                             {
                                 var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                                 double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == point.Time - increment).Seasonal;
+                                // Berelen alle resulaten (Level, Trend, Seasonality etc..) en voeg ze toe aan TESResults
                                 TESResults.Add(tes.CalculateResult(point, previousPoint, SeasonalAdjustment));
                             }
 
                             double TescurrSSE = TESResults.Sum(x => x.SquaredError);
+                            // Als 'SSE' value groter is dan 'huidige SSE' value
+                            // -> Krijgt 'SSE' de value van 'huidige SSE'
                             if (TesSSE == 0 || TesSSE > TescurrSSE)
                             {
                                 TesSSE = TescurrSSE;
@@ -147,13 +152,20 @@ namespace TES
                 _Alpha = Alpha;
                 _Gamma = Gamma;
 
+                // Uncomment dit om resultaten te testen volgens excel sheet.
+
+                //_TesAlpha = 0.307003546945751;
+                //_TesGamma = 0.228914336546831;
+                //_TesDelta = 0;
+
+                // Beste Alpha, Gamma, Delta
                 _TesAlpha = TesAlpha;
                 _TesGamma = TesGamma;
                 _TesDelta = TesDelta;
                 stap /= 10;
             }
 
-            //Calculate for predictions correctly
+            // Bereken predictions
             tes = new TES(_TesAlpha, _TesGamma, _TesDelta);
             var TesLastPoint = TESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
             TESResults = _dataList.Where(x => x.Time < 1).ToList();
@@ -169,6 +181,7 @@ namespace TES
                 var datapoint = new DataPointTes
                 {
                     Time = t,
+                    // Bereken de predictions voor de demand
                     Demand = tes.PredictValues(TesLastPoint, SeasonalAdjustment, t),
                     ForecastError = 0,
                     Trend = 0,
@@ -181,6 +194,7 @@ namespace TES
             }
         }
 
+        // Lees data uit excel file van 'HoltWinterSeasonal' Tab
         private static void SetData()
         {
             var path = @" C: \Users\Stefan\source\repos\TES\TES\Data\SwordForecasting.xlsm";
