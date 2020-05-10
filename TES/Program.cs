@@ -75,7 +75,7 @@ namespace TES
                     for (double b = 0; b < 10; b++)
                     {
                         des = new DES(_Alpha + (a * stap), _Gamma + (b * stap));
-                        //Only calculate DES
+                        // Alleen DES Berekenen
                         DESResults = _dataList.Where(x => x.Time < 1).ToList();
                         foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < LastKnownPoint).ToList())
                         {
@@ -113,17 +113,18 @@ namespace TES
                                 Gamma = _Gamma + (b * stap);
                             }
                         }
-
                         for (double c = 0; c < 10; c++)
                         {
                             tes = new TES(_TesAlpha + (a * stap), _TesGamma + (b * stap), _TesDelta + (c * stap));
+                            // Begin bij t = 1
                             TESResults = _dataList.Where(x => x.Time < 1).ToList();
+                            // Tot t = 36
                             var tesLastPoint = TESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
                             foreach (var point in _dataList.Where(x => x.Time >= 1 && x.Time < LastKnownPoint).ToList())
                             {
                                 var previousPoint = _dataList.FirstOrDefault(x => x.Time == point.Time - 1);
                                 double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == point.Time - increment).Seasonal;
-                                // Berelen alle resulaten (Level, Trend, Seasonality etc..) en voeg ze toe aan TESResults
+                                // Bereken alle resulaten (Level, Trend, Seasonality etc..) en voeg ze toe aan TESResults
                                 TESResults.Add(tes.CalculateResult(point, previousPoint, SeasonalAdjustment));
                             }
 
@@ -165,7 +166,7 @@ namespace TES
                 stap /= 10;
             }
 
-            // Bereken predictions
+            // Bereken TES nog keer met de definitieve Alpha, Gamma, Delta
             tes = new TES(_TesAlpha, _TesGamma, _TesDelta);
             var TesLastPoint = TESResults.FirstOrDefault(x => x.Time == LastKnownPoint - 1);
             TESResults = _dataList.Where(x => x.Time < 1).ToList();
@@ -175,6 +176,7 @@ namespace TES
                 double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == point.Time - increment).Seasonal;
                 TESResults.Add(tes.CalculateResult(point, previousPoint, SeasonalAdjustment));
             }
+            // Van t = 37 tot t = 49
             for (int t = LastKnownPoint; t < 49; t++)
             {
                 double SeasonalAdjustment = _dataList.FirstOrDefault(x => x.Time == t - increment).Seasonal;

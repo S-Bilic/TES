@@ -30,6 +30,7 @@ namespace TES
             CurrentPoint.OneStepForecast = (PreviousPoint.Level + PreviousPoint.Trend) * SeasonalAdjustment;
             CurrentPoint.ForecastError = CurrentPoint.Demand - CurrentPoint.OneStepForecast;
             CurrentPoint.SquaredError = Math.Pow(CurrentPoint.ForecastError, 2);
+
             return CurrentPoint;
         }
 

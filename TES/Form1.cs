@@ -20,7 +20,7 @@ namespace TES
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Alpha.Text = $"Alpa: {Program._TesAlpha.ToString()}";
+            Alpha.Text = $"Alpha: {Program._TesAlpha.ToString()}";
             Gamma.Text = $"Gamma: {Program._TesGamma.ToString()}";
             Delta.Text = $"Delta: {Program._TesDelta.ToString()}";
 

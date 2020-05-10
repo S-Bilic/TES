@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.DisplayChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Alpha = new System.Windows.Forms.Label();
             this.Gamma = new System.Windows.Forms.Label();
@@ -42,16 +42,16 @@
             // 
             // DisplayChart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.DisplayChart.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.DisplayChart.Legends.Add(legend3);
-            this.DisplayChart.Location = new System.Drawing.Point(111, 33);
+            chartArea1.Name = "ChartArea1";
+            this.DisplayChart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.DisplayChart.Legends.Add(legend1);
+            this.DisplayChart.Location = new System.Drawing.Point(111, 96);
             this.DisplayChart.Name = "DisplayChart";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.DisplayChart.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.DisplayChart.Series.Add(series1);
             this.DisplayChart.Size = new System.Drawing.Size(876, 311);
             this.DisplayChart.TabIndex = 0;
             this.DisplayChart.Text = "chart1";
@@ -59,7 +59,7 @@
             // Alpha
             // 
             this.Alpha.AutoSize = true;
-            this.Alpha.Location = new System.Drawing.Point(22, 33);
+            this.Alpha.Location = new System.Drawing.Point(21, 21);
             this.Alpha.Name = "Alpha";
             this.Alpha.Size = new System.Drawing.Size(35, 13);
             this.Alpha.TabIndex = 1;
@@ -68,7 +68,7 @@
             // Gamma
             // 
             this.Gamma.AutoSize = true;
-            this.Gamma.Location = new System.Drawing.Point(22, 54);
+            this.Gamma.Location = new System.Drawing.Point(21, 42);
             this.Gamma.Name = "Gamma";
             this.Gamma.Size = new System.Drawing.Size(35, 13);
             this.Gamma.TabIndex = 2;
@@ -77,7 +77,7 @@
             // Delta
             // 
             this.Delta.AutoSize = true;
-            this.Delta.Location = new System.Drawing.Point(22, 79);
+            this.Delta.Location = new System.Drawing.Point(21, 67);
             this.Delta.Name = "Delta";
             this.Delta.Size = new System.Drawing.Size(35, 13);
             this.Delta.TabIndex = 3;
@@ -86,16 +86,16 @@
             // gvData
             // 
             this.gvData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gvData.Location = new System.Drawing.Point(111, 363);
+            this.gvData.Location = new System.Drawing.Point(111, 422);
             this.gvData.Name = "gvData";
-            this.gvData.Size = new System.Drawing.Size(876, 150);
+            this.gvData.Size = new System.Drawing.Size(876, 234);
             this.gvData.TabIndex = 4;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1062, 603);
+            this.ClientSize = new System.Drawing.Size(1062, 684);
             this.Controls.Add(this.gvData);
             this.Controls.Add(this.Delta);
             this.Controls.Add(this.Gamma);
